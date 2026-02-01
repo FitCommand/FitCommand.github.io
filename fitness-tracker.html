@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IRON PULSE — Fitness Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #1a1714;
+    --surface: #231f1b;
+    --surface2: #2c2722;
+    --border: #3d3632;
+    --text: #e8e0d8;
+    --text-dim: #7a7068;
+    --accent: #c96a3a;
+    --accent2: #d4855a;
+    --accent-dim: rgba(201,106,58,0.13);
+    --accent-glow: rgba(201,106,58,0.35);
+    --red: #d95b5b;
+    --blue: #6fa8c7;
+    --green: #7ab87a;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative;
+    padding: 38px 40px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  header::after {
+    content:'';
+    position:absolute;
+    bottom:-1px; left:0; right:0;
+    height:2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 8px;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 22px;
+  }
+  .logo-mark span {
+    display: block;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: barPulse 1.4s ease-in-out infinite;
+  }
+  .logo-mark span:nth-child(1) { height: 10px; animation-delay: 0s; }
+  .logo-mark span:nth-child(2) { height: 18px; animation-delay: 0.15s; }
+  .logo-mark span:nth-child(3) { height: 22px; animation-delay: 0.3s; }
+  .logo-mark span:nth-child(4) { height: 16px; animation-delay: 0.45s; }
+  .logo-mark span:nth-child(5) { height: 8px;  animation-delay: 0.6s; }
+  @keyframes barPulse {
+    0%,100% { opacity: 0.35; }
+    50%      { opacity: 1; }
+  }
+  .header-sub {
+    color: var(--text-dim);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 24px 40px 0;
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+  .tab {
+    position: relative;
+    padding: 10px 22px;
+    border: 1px solid transparent;
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all .22s ease;
+    user-select: none;
+  }
+  .tab .tab-type {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    opacity: 0.6;
+    margin-right: 6px;
+    text-transform: uppercase;
+  }
+  .tab:hover { color: var(--text); background: var(--accent-dim); }
+  .tab.active {
+    color: var(--accent);
+    background: var(--surface2);
+    border-color: var(--border);
+    border-bottom-color: var(--surface2);
+  }
+  .tab.active .tab-type { color: var(--accent); opacity: 0.5; }
+
+  .tab-bar-bottom { height:1px; background:var(--border); margin:0 40px; }
+
+  /* ─── MAIN CONTENT ─── */
+  .content { display:none; padding: 36px 40px 60px; animation: fadeIn .28s ease; }
+  .content.active { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── DEVICE INFO ─── */
+  .device-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .device-name {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:26px;
+    letter-spacing:3px;
+    color: var(--text);
+  }
+  .device-meta {
+    font-size:11px;
+    color: var(--text-dim);
+    letter-spacing:1px;
+    margin-top: 3px;
+  }
+  .status-dot {
+    width:8px; height:8px;
+    border-radius:50%;
+    display:inline-block;
+    flex-shrink:0;
+  }
+  .status-dot.online  { background: var(--green); box-shadow:0 0 6px var(--green); }
+  .status-dot.offline { background: var(--text-dim); }
+
+  /* ─── STAT CARDS ─── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 18px 18px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s, transform .15s;
+    user-select: none;
+  }
+  .stat-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+  .stat-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-dim), 0 4px 24px var(--accent-glow);
+  }
+  .stat-card .label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .stat-card .value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: var(--accent);
+  }
+  .stat-card .unit {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 3px;
+  }
+  .stat-card .trend {
+    font-size: 10px;
+    margin-top: 7px;
+    color: var(--text-dim);
+  }
+  .stat-card .trend .up   { color: var(--green); }
+  .stat-card .trend .down { color: var(--red); }
+  .stat-card .click-hint {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    opacity: 0.5;
+    margin-top: 8px;
+    text-transform: uppercase;
+    transition: opacity .2s;
+  }
+  .stat-card:hover .click-hint { opacity: 0.9; }
+  .stat-card.active .click-hint { opacity: 0; }
+  .stat-card::before {
+    content:'';
+    position:absolute;
+    top:0; right:0;
+    width:44px; height:44px;
+    background: var(--accent-dim);
+    border-radius: 0 10px 40px 0;
+    opacity: 0.6;
+  }
+
+  /* ─── CHART PANEL ─── */
+  .chart-panel {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .42s cubic-bezier(.4,0,.2,1), opacity .3s ease .05s, margin .3s ease;
+    margin-bottom: 0;
+  }
+  .chart-panel.open {
+    max-height: 260px;
+    opacity: 1;
+    margin-bottom: 32px;
+  }
+  .chart-inner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 22px 18px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .chart-title {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .chart-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .chart-close:hover { border-color: var(--accent); color: var(--accent); }
+  .chart-panel svg { display:block; width:100%; height:130px; }
+  .chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding: 0 14px;
+  }
+  .chart-labels span { font-size: 9px; color: var(--text-dim); letter-spacing:0.5px; }
+
+  /* ─── SESSION TABLE ─── */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .session-table { width: 100%; border-collapse: collapse; }
+  .session-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  .session-table td {
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(61,54,50,0.45);
+    font-size: 13px;
+    color: var(--text);
+    transition: background .15s;
+  }
+  .session-table tr:hover td { background: var(--accent-dim); }
+  .session-table .date { color: var(--text-dim); font-size: 12px; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge.easy     { background: rgba(111,168,199,0.12); color: var(--blue); }
+  .badge.moderate { background: rgba(201,106,58,0.14);  color: var(--accent2); }
+  .badge.hard     { background: rgba(217,91,91,0.12);   color: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark"><span></span><span></span><span></span><span></span><span></span></div>
+    IRON PULSE
+  </div>
+  <div class="header-sub">Fitness Device Tracker &mdash; 5 Devices Connected</div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<div class="tab-bar-bottom"></div>
+<div id="panels"></div>
+
+<script>
+const devices = [
+  {
+    id:'bike1', label:'Bike 1', name:'TREK DOMANE',
+    meta:'Stationary · Bluetooth 5.2', status:'online',
+    stats: { duration:'1h 24m', calories:680, distance:'42.3', rpm:94 },
+    trends: { duration:'+12%', calories:'+8%', distance:'+5%', rpm:'-2%' },
+    history: {
+      duration: ['55m','1h 10m','1h 45m','1h 10m','1h 24m','58m','1h 24m'],
+      calories: [420, 612, 890, 612, 680, 510, 680],
+      distance: [22.1, 37.8, 55.1, 37.8, 42.3, 26.5, 42.3],
+      rpm:      [78,  88,  102, 88,  94,  81,  94]
+    },
+    sessions: [
+      { date:'Jan 30, 2026', dur:'1h 24m', dist:'42.3 km', cal:'680', rpm:'94', diff:'Moderate' },
+      { date:'Jan 28, 2026', dur:'1h 10m', dist:'37.8 km', cal:'612', rpm:'88', diff:'Easy' },
+      { date:'Jan 25, 2026', dur:'1h 45m', dist:'55.1 km', cal:'890', rpm:'102', diff:'Hard' },
+      { date:'Jan 22, 2026', dur:'55m',    dist:'28.4 km', cal:'470', rpm:'82', diff:'Easy' },
+      { date:'Jan 19, 2026', dur:'1h 30m', dist:'46.7 km', cal:'750', rpm:'97', diff:'Moderate' },
+    ]
+  },
+  {
+    id:'bike2', label:'Bike 2', name:'SPECIALIZED TARMAC',
+    meta:'Stationary · Bluetooth 5.1', status:'online',
+    stats: { duration:'52m', calories:480, distance:'24.1', rpm:86 },
+    trends: { duration:'-3%', calories:'+2%', distance:'-4%', rpm:'+6%' },
+    history: {
+      duration: ['1h 05m','45m','1h 15m','45m','52m','48m','52m'],
+      calories: [580, 390, 720, 390, 480, 440, 480],
+      distance: [31.0, 21.5, 38.2, 21.5, 24.1, 22.8, 24.1],
+      rpm:      [90,  80,  95,  80,  86,  83,  86]
+    },
+    sessions: [
+      { date:'Jan 29, 2026', dur:'52m',    dist:'24.1 km', cal:'480', rpm:'86', diff:'Moderate' },
+      { date:'Jan 27, 2026', dur:'45m',    dist:'21.5 km', cal:'390', rpm:'80', diff:'Easy' },
+      { date:'Jan 24, 2026', dur:'1h 15m', dist:'38.2 km', cal:'720', rpm:'95', diff:'Hard' },
+      { date:'Jan 21, 2026', dur:'40m',    dist:'18.8 km', cal:'330', rpm:'76', diff:'Easy' },
+      { date:'Jan 18, 2026', dur:'1h 05m', dist:'31.0 km', cal:'580', rpm:'90', diff:'Moderate' },
+    ]
+  },
+  {
+    id:'bike3', label:'Bike 3', name:'CANNONDALE SUPER SIX',
+    meta:'Stationary · ANT+', status:'offline',
+    stats: { duration:'1h 02m', calories:570, distance:'31.6', rpm:91 },
+    trends: { duration:'+7%', calories:'+11%', distance:'+9%', rpm:'+1%' },
+    history: {
+      duration: ['1h 10m','35m','1h 20m','50m','1h 02m','55m','1h 02m'],
+      calories: [600, 280, 810, 440, 570, 490, 570],
+      distance: [34.5, 16.2, 48.4, 25.0, 31.6, 28.1, 31.6],
+      rpm:      [93,  74,  99,  84,  91,  88,  91]
+    },
+    sessions: [
+      { date:'Jan 26, 2026', dur:'1h 02m', dist:'31.6 km', cal:'570', rpm:'91', diff:'Moderate' },
+      { date:'Jan 23, 2026', dur:'50m',    dist:'25.0 km', cal:'440', rpm:'84', diff:'Easy' },
+      { date:'Jan 20, 2026', dur:'1h 20m', dist:'48.4 km', cal:'810', rpm:'99', diff:'Hard' },
+      { date:'Jan 16, 2026', dur:'35m',    dist:'16.2 km', cal:'280', rpm:'74', diff:'Easy' },
+      { date:'Jan 13, 2026', dur:'1h 10m', dist:'34.5 km', cal:'600', rpm:'93', diff:'Moderate' },
+    ]
+  },
+  {
+    id:'rower1', label:'Rower 1', name:'CONCEPT2 MODEL D',
+    meta:'Ergometer · USB · PM5', status:'online',
+    stats: { duration:'35m', calories:520, distance:'7.2', spm:28 },
+    trends: { duration:'+4%', calories:'+15%', distance:'+6%', spm:'+3%' },
+    history: {
+      duration: ['40m','30m','20m','25m','35m','32m','35m'],
+      calories: [610, 460, 300, 380, 520, 440, 520],
+      distance: [8.5, 6.2, 4.0, 5.1, 7.2, 6.5, 7.2],
+      spm:      [30,  26,  22,  24,  28,  27,  28]
+    },
+    sessions: [
+      { date:'Jan 31, 2026', dur:'35m',  dist:'7.2 km',  cal:'520', spm:'28', diff:'Hard' },
+      { date:'Jan 29, 2026', dur:'25m',  dist:'5.1 km',  cal:'380', spm:'24', diff:'Moderate' },
+      { date:'Jan 26, 2026', dur:'20m',  dist:'4.0 km',  cal:'300', spm:'22', diff:'Easy' },
+      { date:'Jan 23, 2026', dur:'30m',  dist:'6.2 km',  cal:'460', spm:'26', diff:'Moderate' },
+      { date:'Jan 20, 2026', dur:'40m',  dist:'8.5 km',  cal:'610', spm:'30', diff:'Hard' },
+    ]
+  },
+  {
+    id:'rower2', label:'Rower 2', name:'WATERROWER NATURAL',
+    meta:'Ergometer · Bluetooth 5.0', status:'online',
+    stats: { duration:'28m', calories:390, distance:'5.6', spm:25 },
+    trends: { duration:'-6%', calories:'-2%', distance:'-5%', spm:'-1%' },
+    history: {
+      duration: ['32m','22m','35m','20m','28m','25m','28m'],
+      calories: [470, 270, 510, 320, 390, 350, 390],
+      distance: [6.5, 3.8, 7.0, 4.4, 5.6, 5.0, 5.6],
+      spm:      [27,  21,  29,  22,  25,  24,  25]
+    },
+    sessions: [
+      { date:'Jan 30, 2026', dur:'28m',  dist:'5.6 km',  cal:'390', spm:'25', diff:'Moderate' },
+      { date:'Jan 27, 2026', dur:'22m',  dist:'4.4 km',  cal:'320', spm:'22', diff:'Easy' },
+      { date:'Jan 24, 2026', dur:'35m',  dist:'7.0 km',  cal:'510', spm:'29', diff:'Hard' },
+      { date:'Jan 21, 2026', dur:'20m',  dist:'3.8 km',  cal:'270', spm:'21', diff:'Easy' },
+      { date:'Jan 17, 2026', dur:'32m',  dist:'6.5 km',  cal:'470', spm:'27', diff:'Moderate' },
+    ]
+  }
+];
+
+const chartTitles = {
+  duration:'Session Duration — Last 7',
+  calories:'Calorie Burn — Last 7',
+  distance:'Distance Covered — Last 7',
+  rpm:'Avg RPM — Last 7',
+  spm:'Avg SPM — Last 7'
+};
+const chartUnits = { duration:'', calories:'kcal', distance:'km', rpm:'rpm', spm:'spm' };
+
+// ─── BUILD ────────────────────────────────────────────────────
+const tabsEl   = document.getElementById('tabs');
+const panelsEl = document.getElementById('panels');
+
+devices.forEach((dev, i) => {
+  const isBike  = dev.id.startsWith('bike');
+  const rateKey = isBike ? 'rpm' : 'spm';
+
+  // Tab
+  const tab = document.createElement('button');
+  tab.className = 'tab' + (i===0?' active':'');
+  tab.dataset.target = dev.id;
+  tab.innerHTML = `<span class="tab-type">${isBike?'Bike':'Rower'}</span>${dev.label}`;
+  tab.onclick = () => switchTab(dev.id);
+  tabsEl.appendChild(tab);
+
+  // Panel
+  const panel = document.createElement('div');
+  panel.className = 'content' + (i===0?' active':'');
+  panel.id = dev.id;
+
+  panel.innerHTML = `
+    <div class="device-info">
+      <span class="status-dot ${dev.status}"></span>
+      <div>
+        <div class="device-name">${dev.name}</div>
+        <div class="device-meta">${dev.meta} &nbsp;·&nbsp; ${dev.status.toUpperCase()} &nbsp;·&nbsp; Last: ${dev.sessions[0].date}</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card" data-stat="duration" onclick="toggleChart('${dev.id}','duration')">
+        <div class="label">Last Duration</div>
+        <div class="value">${dev.stats.duration}<span class="unit"></span></div>
+        <div class="trend">vs prev <span class="${dev.trends.duration.startsWith('+')?'up':'down'}">${dev.trends.duration}</span></div>
+        <div class="click-hint">tap for history</div>
+      </div>
+      <div class="stat-card" data-stat="calories" onclick="toggleChart('${dev.id}','calories')">
+        <div class="label">Calories</div>
+        <div class="value">${dev.stats.calories}<span class="unit">kcal</span></div>
+        <div class="trend">vs prev <span class="${dev.trends.calories.startsWith('+')?'up':'down'}">${dev.trends.calories}</span></div>
+        <div class="click-hint">tap for history</div>
+      </div>
+      <div class="stat-card" data-stat="distance" onclick="toggleChart('${dev.id}','distance')">
+        <div class="label">Distance</div>
+        <div class="value">${dev.stats.distance}<span class="unit">km</span></div>
+        <div class="trend">vs prev <span class="${dev.trends.distance.startsWith('+')?'up':'down'}">${dev.trends.distance}</span></div>
+        <div class="click-hint">tap for history</div>
+      </div>
+      <div class="stat-card" data-stat="${rateKey}" onclick="toggleChart('${dev.id}','${rateKey}')">
+        <div class="label">Avg ${rateKey.toUpperCase()}</div>
+        <div class="value">${isBike?dev.stats.rpm:dev.stats.spm}<span class="unit">${rateKey}</span></div>
+        <div class="trend">vs prev <span class="${(isBike?dev.trends.rpm:dev.trends.spm).startsWith('+')?'up':'down'}">${isBike?dev.trends.rpm:dev.trends.spm}</span></div>
+        <div class="click-hint">tap for history</div>
+      </div>
+    </div>
+
+    <div class="chart-panel" id="chart-${dev.id}">
+      <div class="chart-inner">
+        <div class="chart-header">
+          <div class="chart-title" id="chartTitle-${dev.id}">—</div>
+          <button class="chart-close" onclick="closeChart('${dev.id}')">✕ Close</button>
+        </div>
+        <div id="chartSvg-${dev.id}"></div>
+        <div class="chart-labels" id="chartLabels-${dev.id}"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Recent Sessions</div>
+    <table class="session-table">
+      <thead><tr>
+        <th>Date</th><th>Duration</th><th>Distance</th><th>Calories</th>
+        <th>${rateKey.toUpperCase()}</th><th>Difficulty</th>
+      </tr></thead>
+      <tbody>
+        ${dev.sessions.map(s=>`
+          <tr>
+            <td class="date">${s.date}</td>
+            <td>${s.dur}</td>
+            <td>${s.dist}</td>
+            <td>${s.cal} kcal</td>
+            <td>${isBike?s.rpm:s.spm}</td>
+            <td><span class="badge ${s.diff.toLowerCase()}">${s.diff}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  panelsEl.appendChild(panel);
+});
+
+// ─── CHART TOGGLE ─────────────────────────────────────────────
+let activeChart = {};
+
+function toggleChart(devId, statKey) {
+  const panel = document.getElementById('chart-' + devId);
+  const cards = document.querySelectorAll('#' + devId + ' .stat-card');
+  const dev   = devices.find(d => d.id === devId);
+
+  if (activeChart[devId] === statKey) { closeChart(devId); return; }
+
+  cards.forEach(c => c.classList.toggle('active', c.dataset.stat === statKey));
+  activeChart[devId] = statKey;
+
+  document.getElementById('chartTitle-' + devId).textContent = chartTitles[statKey];
+
+  const data = dev.history[statKey];
+  document.getElementById('chartSvg-' + devId).innerHTML = buildSparkline(data, statKey);
+
+  // Session labels (newest = right)
+  document.getElementById('chartLabels-' + devId).innerHTML =
+    data.map((_, i) => `<span>S${i+1}</span>`).join('');
+
+  panel.classList.add('open');
+}
+
+function closeChart(devId) {
+  document.getElementById('chart-' + devId).classList.remove('open');
+  document.querySelectorAll('#' + devId + ' .stat-card').forEach(c => c.classList.remove('active'));
+  activeChart[devId] = null;
+}
+
+// ─── SPARKLINE ────────────────────────────────────────────────
+function buildSparkline(data, statKey) {
+  // For duration strings, convert to minutes for plotting
+  let plotData = data;
+  if (statKey === 'duration') {
+    plotData = data.map(d => {
+      const m = d.match(/(?:(\d+)h\s*)?(\d+)m/);
+      return m ? (parseInt(m[1]||0)*60 + parseInt(m[2])) : 0;
+    });
+  }
+
+  const w = 1000, h = 120, pad = 20;
+  const max = Math.max(...plotData);
+  const min = Math.min(...plotData);
+  const range = max - min || 1;
+  const step = (w - pad*2) / (plotData.length - 1);
+
+  const pts = plotData.map((v, i) => ({
+    x: pad + i * step,
+    y: h - pad - ((v - min) / range) * (h - pad*2),
+    v, label: data[i] // original label for display
+  }));
+
+  let areaD = `M ${pts[0].x} ${h}`;
+  pts.forEach(p => areaD += ` L ${p.x} ${p.y}`);
+  areaD += ` L ${pts[pts.length-1].x} ${h} Z`;
+
+  let lineD = pts.map((p,i) => (i===0?'M':'L')+` ${p.x} ${p.y}`).join(' ');
+
+  const unit = chartUnits[statKey];
+  const gid  = 'grad_' + statKey;
+
+  const dots = pts.map(p =>
+    `<circle cx="${p.x}" cy="${p.y}" r="3.8" fill="var(--accent)" stroke="var(--surface)" stroke-width="2.5"/>`
+  ).join('');
+
+  const labels = pts.map(p => {
+    const display = statKey === 'duration' ? p.label : (p.v + (unit ? ' '+unit : ''));
+    return `<text x="${p.x}" y="${p.y - 11}" text-anchor="middle" font-family="DM Mono,monospace" font-size="9.5" fill="var(--text-dim)">${display}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.01"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaD}" fill="url(#${gid})"/>
+    <path d="${lineD}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${labels}
+    ${dots}
+  </svg>`;
+}
+
+// ─── TAB SWITCH ───────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.target===id));
+  document.querySelectorAll('.content').forEach(p => p.classList.toggle('active', p.id===id));
+}
+</script>
+</body>
+</html>
